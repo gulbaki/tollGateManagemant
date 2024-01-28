@@ -34,10 +34,18 @@ To install the project, follow these steps:
 
 6.  Seed the database: php artisan db:seed
 
+## Handling Callbacks
+The system will automatically send a callback to the provided success or failure URL, including the transaction hash in the request.
+
+
+## Testing
+
+`php artisan test`
+
 
 ## Usage
 
-To initiate a payment process, make a POST request to the `/api/payment` endpoint with the following payload:
+To initiate a payment process, make a POST request to the `/api/payment/process` endpoint with the following payload:
 
 ```json
 {
@@ -46,7 +54,4 @@ To initiate a payment process, make a POST request to the `/api/payment` endpoin
 "callback_success_url": "https://case.altpay.dev/success",
 "callback_fail_url": "https://case.altpay.dev/fail",
 "hash": "2918f946ce80bd37e7dbf4ade4888df9d281de0d"
-}
-
-
-
+}```
