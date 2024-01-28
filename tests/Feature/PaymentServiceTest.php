@@ -24,7 +24,7 @@ class PaymentServiceTest extends TestCase
             'hash' => "2918f946ce80bd37e7dbf4ade4888df9d281de0d"
         ]);
 
-        config(['custom.salt' => 'case2023']);
+        config(['app.salt' => 'case2023']);
 
         $paymentService = new PaymentService();
 
@@ -41,7 +41,7 @@ class PaymentServiceTest extends TestCase
 
         ]);
 
-        config(['custom.salt' => 'case2023']);
+        config(['app.salt' => 'case2023']);
 
         $paymentService = new PaymentService();
 

@@ -7,6 +7,7 @@ use App\Models\Entries;
 use App\Models\Transactions;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EntryService
 {
@@ -15,7 +16,7 @@ class EntryService
 
     public function createEntry(PaymentRequest $paymentRequest): array
     {
-        $userId =  1; //$paymentRequest->userId;
+        $userId =  1; // mock data trying => $paymentRequest->userId;
         $price = $paymentRequest->price;
 
         $response =  DB::transaction(function () use ($userId, $price) {
@@ -56,6 +57,7 @@ class EntryService
             $entry->user_id = $userId;
             $entry->save();
 
+            Log::info('Login successful');
             return ['message' => 'Login successful', 'entry' => $entry, 'status' => 200];
         });
 
@@ -69,6 +71,7 @@ class EntryService
 
         // Check if the user exists, if not, return an error response
         if (!$userEntry) {
+            Log::alert('User not found');
             return ['error' => 'User not found', 'status' => 404];
         }
 
@@ -78,10 +81,10 @@ class EntryService
             ->count();
 
         if ($count >= self::DAILY_LIMIT) {
+            log::alert('You have reached the daily login limit');
             return ['error' => 'You have reached the daily login limit', 'status' => 403];
         }
 
-        // Return the count and a success status code
         return ['count' => $count, 'status' => 200];
     }
     public function getTotalEntriesForToday()
@@ -89,6 +92,7 @@ class EntryService
         $count = Entries::whereDate('created_at', today())->count();
 
         if ($count >= self::TOTAL_LIMIT) {
+            log::alert('The cafeteria"s total entry limit has been exceeded');
             return ['error' => 'The cafeteria"s total entry limit has been exceeded', 'status' => 403];
         }
 
