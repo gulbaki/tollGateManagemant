@@ -16,49 +16,57 @@ class EntryService
 
     public function createEntry(PaymentRequest $paymentRequest): array
     {
-        $userId =  1; // mock data trying => $paymentRequest->userId;
+        $userId =  $paymentRequest->user_id;
         $price = $paymentRequest->price;
-
+        
         $response =  DB::transaction(function () use ($userId, $price) {
-            // Obtain a lock on the user record
-            $user = User::lockForUpdate()->find($userId);
+
+            try {
+
+                $user = User::where('uuid', $userId)->lockForUpdate()->first();
+
+       
+                if (!$user) {
+                    return ['error' => 'User not found', 'status' => 404];
+                }
+
+                $todayEntries = self::getDailyEntryCount($user->id);
+
+                if (isset($todayEntries['error'])) {
+                    return $todayEntries;
+                }
+
+                $totalEntriesToday = self::getTotalEntriesForToday();
+
+                if (isset($totalEntriesToday['error'])) {
+                    return $totalEntriesToday;
+                }
+
+                if ($user->wallet < $price) {
+                    return ['error' => "insufficient funds", 'status' => 422];
+                }
 
 
-            if (!$user) {
-                return ['error' => 'User not found', 'status' => 404];
+                $transaction = new Transactions([
+                    'user_id' => $user->id,
+                    'amount'  => $price,
+                ]);
+                $transaction->save();
+                $user->wallet -= $price;
+                $user->save();
+                $entry = new Entries();
+                $entry->user_id = $user->id;
+                $entry->save();
+
+                Log::info('Entry creation successful'  . $user->id);
+
+                return ['message' => 'Entry creation successful', 'entry' => $entry, 'status' => 200];
+
+            } catch (\Exception $e) {
+                Log::error('Entry creation failed: ' . $e->getMessage());
+
+                return ['error' => 'Transaction failed', 'status' => 500];
             }
-
-            $todayEntries = self::getDailyEntryCount($userId);
-
-            if (isset($todayEntries['error'])) {
-                return $todayEntries;
-            }
-
-            $totalEntriesToday = self::getTotalEntriesForToday();
-
-            if (isset($totalEntriesToday['error'])) {
-                return $totalEntriesToday;
-            }
-
-            if ($user->wallet < $price) {
-                return ['error' => "insufficient funds", 'status' => 422];
-            }
-
-
-            $transaction = new Transactions([
-                'user_id' => $userId,
-                'amount'  => $price,
-                // Populate other fields as necessary
-            ]);
-            $transaction->save();
-            $user->wallet -= $price;
-            $user->save();
-            $entry = new Entries();
-            $entry->user_id = $userId;
-            $entry->save();
-
-            Log::info('Login successful');
-            return ['message' => 'Login successful', 'entry' => $entry, 'status' => 200];
         });
 
 
@@ -66,16 +74,13 @@ class EntryService
     }
     public function getDailyEntryCount(int $userId): array
     {
-        // Find the user's entry record
         $userEntry = User::find($userId);
 
-        // Check if the user exists, if not, return an error response
         if (!$userEntry) {
             Log::alert('User not found');
             return ['error' => 'User not found', 'status' => 404];
         }
 
-        // Retrieve the count of entries for the user created today
         $count = Entries::where('user_id', $userId)
             ->whereDate('created_at', now()->today())
             ->count();
