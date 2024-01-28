@@ -45,6 +45,9 @@ The system will automatically send a callback to the provided success or failure
 
 ## Usage
 
+### Note!
+Since we do not create users, it can be tested on a single user with the static information provided!
+
 To initiate a payment process, make a POST request to the `/api/payment/process` endpoint with the following payload:
 
 ```json
