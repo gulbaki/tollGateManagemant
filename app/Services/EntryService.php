@@ -23,7 +23,7 @@ class EntryService
 
             try {
 
-                $user = User::where('uuid', $userId)->lockForUpdate()->first();
+                $user = User::lockForUpdate()->find($userId);
 
                 if (!$user) {
                     return ['error' => 'User not found', 'status' => 404];
@@ -46,17 +46,17 @@ class EntryService
                 }
 
                 $transaction = new Transactions([
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'amount'  => $price,
                 ]);
                 $transaction->save();
                 $user->wallet -= $price;
                 $user->save();
                 $entry = new Entries();
-                $entry->user_id = $user->id;
+                $entry->user_id = $userId;
                 $entry->save();
 
-                Log::info('Entry creation successful'  . $user->id);
+                Log::info('Entry creation successful'  . $userId);
 
                 return ['message' => 'Entry creation successful', 'entry' => $entry, 'status' => 200];
 
