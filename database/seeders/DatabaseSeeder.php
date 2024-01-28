@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
 
         DB::table('users')->insert([
             'id' => 1, // Assuming 'id' is not an auto-incrementing field anymore
+            "uuid" => "3b43544b-10b4-45e2-ab81-2b2b3f1917e8",
             'name' => 'baki',
             'email' => 'bakigul@gmail.com',
             'password' => Hash::make('baki'), // You should encrypt the password
