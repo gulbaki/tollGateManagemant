@@ -17,14 +17,13 @@ class EntryTest extends TestCase
     public function testCreateEntrySuccess()
     {
         // Arrange
-        $user = User::find(1);
+        $user = User::find("3b43544b-10b4-45e2-ab81-2b2b3f1917e8");
 
         $user = [
             "id" => $user->id,
             "user_id" => $user->id,
             "wallet" => $user->wallet
         ];
-
 
         $price = 55.33; // example price
 
