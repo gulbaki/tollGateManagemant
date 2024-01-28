@@ -30,9 +30,9 @@ To install the project, follow these steps:
 
 4. Generate an application key:
 
-5. Run migrations: php artisan migrate
+5. Run migrations: `php artisan migrate`
 
-6.  Seed the database: php artisan db:seed
+6.  Seed the database: `php artisan db:seed`
 
 ## Handling Callbacks
 The system will automatically send a callback to the provided success or failure URL, including the transaction hash in the request.
