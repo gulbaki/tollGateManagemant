@@ -22,7 +22,7 @@ class EntryService
             // Obtain a lock on the user record
             $user = User::lockForUpdate()->find($userId);
 
-          
+
             if (!$user) {
                 return ['error' => 'User not found', 'status' => 404];
             }
@@ -59,7 +59,7 @@ class EntryService
             return ['message' => 'Login successful', 'entry' => $entry, 'status' => 200];
         });
 
-       
+
         return $response;
     }
     public function getDailyEntryCount(int $userId): array

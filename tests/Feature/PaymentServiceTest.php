@@ -74,7 +74,7 @@ class PaymentServiceTest extends TestCase
 
     public function testCallbackFailure()
     {
-   
+
         Http::fake([
             '*' => Http::response(['message' => 'Error occurred'], 400),
         ]);

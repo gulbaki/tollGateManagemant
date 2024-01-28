@@ -25,7 +25,7 @@ class EntryTest extends TestCase
             "wallet" => $user->wallet
         ];
 
-        
+
         $price = 55.33; // example price
 
         // Mock a PaymentRequest with expected data
