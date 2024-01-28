@@ -13,7 +13,7 @@ class PaymentService
         $callbackSuccesUrl = $paymentRequest->callback_success_url;
         $price = $paymentRequest->price;
         $hash = $paymentRequest->hash;
-        $salt = 'case2023';
+        $salt = config('custom.salt');
 
         $cHash = sha1(sprintf(
             '%s%s%s%s',
@@ -35,7 +35,7 @@ class PaymentService
         $callBackFailUrl = $paymentRequest->callback_fail_url;
         $callbackSuccesUrl = $paymentRequest->callback_success_url;
         $price = $paymentRequest->price;
-        $salt = 'case2023';
+        $salt = config('custom.salt');
 
         return sha1(sprintf(
             '%s%s%s%s',

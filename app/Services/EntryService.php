@@ -15,14 +15,14 @@ class EntryService
 
     public function createEntry(PaymentRequest $paymentRequest): array
     {
-
-        $userId = 1;
+        $userId =  1; //$paymentRequest->userId;
         $price = $paymentRequest->price;
 
         $response =  DB::transaction(function () use ($userId, $price) {
             // Obtain a lock on the user record
             $user = User::lockForUpdate()->find($userId);
 
+          
             if (!$user) {
                 return ['error' => 'User not found', 'status' => 404];
             }
@@ -59,6 +59,7 @@ class EntryService
             return ['message' => 'Login successful', 'entry' => $entry, 'status' => 200];
         });
 
+       
         return $response;
     }
     public function getDailyEntryCount(int $userId): array
