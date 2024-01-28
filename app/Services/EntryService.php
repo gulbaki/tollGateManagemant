@@ -18,14 +18,13 @@ class EntryService
     {
         $userId =  $paymentRequest->user_id;
         $price = $paymentRequest->price;
-        
+
         $response =  DB::transaction(function () use ($userId, $price) {
 
             try {
 
                 $user = User::where('uuid', $userId)->lockForUpdate()->first();
 
-       
                 if (!$user) {
                     return ['error' => 'User not found', 'status' => 404];
                 }
@@ -45,7 +44,6 @@ class EntryService
                 if ($user->wallet < $price) {
                     return ['error' => "insufficient funds", 'status' => 422];
                 }
-
 
                 $transaction = new Transactions([
                     'user_id' => $user->id,

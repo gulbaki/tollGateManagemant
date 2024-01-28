@@ -32,7 +32,6 @@ class PaymentService
         Log::info('This hash correct');
         return ['message' => 'Hash Correct', 'status' => 200];
     }
-
     public function getCallbackHash(PaymentRequest $paymentRequest): string
     {
         $callBackFailUrl = $paymentRequest->callback_fail_url;
@@ -49,20 +48,27 @@ class PaymentService
         ));
     }
 
-
     public function callback(string $callbackUrl, string $hash): array
     {
 
-        $response = Http::post($callbackUrl, [
-            'hash' => $hash,
-        ]);
+        try {
+            $response = Http::timeout(30)->post($callbackUrl, [
+                'hash' => $hash,
+            ]);
 
-        if ($response->successful()) {
-            Log::info('Payment Callback Successfull');
-            return ['message' => 'Payment Callback Successfull', 'status' => $response->status()];
+            if ($response->successful()) {
+                Log::info('Payment Callback Successfull');
+                return ['message' => 'Payment Callback Successfull', 'status' => $response->status()];
 
+            }
+
+            Log::error('Payment Callback failed', ['message' => $response->json()['message']]);
+            return ['error' => 'Payment Callback failed -> ' . $response->json()['message'], 'status' => $response->status()];
+
+        } catch (\Exception $e) {
+
+            Log::error('Payment Callback request failed: ' . $e->getMessage());
+            return ['error' => 'Payment Callback request failed: ' . $e->getMessage(), 'status' => 500];
         }
-        Log::error('Payment Callback failed', ['message' => $response->json()['message']]);
-        return ['error' => 'Payment Callback failed -> ' . $response->json()['message'], 'status' => $response->status()];
     }
 }
